@@ -1,0 +1,103 @@
+name: evince
+version: git
+summary: Document viewer for popular document formats
+description: |
+  This is a document viewer for the GNOME desktop.
+  It supports the following document formats: PDF, PS, EPS, XPS, DjVu, TIFF, DVI (with SyncTeX), and Comic Books archives (CBR, CBT, CBZ, CB7).
+
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict
+base: core20
+
+slots:
+  # for GtkApplication registration
+  evince:
+    interface: dbus
+    bus: session
+    name: org.gnome.Evince
+
+apps:
+  evince:
+    command: usr/bin/evince
+    extensions: [gnome-3-38]
+    plugs:
+      - avahi-observe
+      - cups-control
+      - gsettings
+      - home
+      - network
+      - removable-media
+    desktop: usr/share/applications/org.gnome.Evince.desktop
+  evince-previewer:
+    command: usr/bin/evince-previewer
+    plugs:
+      - avahi-observe
+      - cups-control
+      - gsettings
+      - home
+      - network
+    desktop: usr/share/applications/org.gnome.Evince-previewer.desktop
+  evince-thumbnailer:
+    command: usr/bin/evince-thumbnailer
+    plugs:
+      - gsettings
+      - home
+
+parts:
+  evince:
+    source: https://gitlab.gnome.org/GNOME/evince.git
+    source-type: git
+    plugin: meson
+    meson-parameters:
+       - --prefix=/snap/evince/current/usr
+       - -Dnautilus=false
+       - -Dgtk_doc=false
+       - -Dintrospection=false
+
+    organize:
+      snap/evince/current/usr: usr
+    build-packages:
+      - appstream
+      - intltool
+      - libarchive-dev
+      - libgail-3-dev
+      - libgspell-1-dev
+      - libgstreamer1.0-dev
+      - libgstreamer-plugins-base1.0-dev
+      - libsecret-1-dev
+      - libsm-dev
+      - zlib1g-dev
+      - libpoppler-glib-dev
+      - libspectre-dev
+      - libtiff-dev
+      - libdjvulibre-dev
+      - libkpathsea-dev
+      - libgxps-dev
+      - autotools-dev
+      - gsettings-desktop-schemas-dev
+      - dh-apparmor
+    prime:
+      - "-usr/lib/*.a"
+      - "-usr/lib/mozilla"
+      - "-usr/lib/pkgconfig"
+      - "-usr/lib/systemd"
+      - "-usr/lib/evince/4/backends/*.a"
+      - "-usr/share/appdata"
+  libraries:
+    plugin: nil
+    stage-packages:
+      - libarchive13
+      - libpoppler-glib8
+      - libpoppler97
+      - libnss3
+      - libnspr4
+    prime:
+      - "usr/lib/*/libarchive.so.*"
+      - "usr/lib/*/libpoppler-glib.so.*"
+      - "usr/lib/*/libpoppler.so.*"
+      - "usr/lib/*/libnss3.so"
+      - "usr/lib/*/libnssutil3.so"
+      - "usr/lib/*/libsmime3.so"
+      - "usr/lib/*/libnspr4.so"
+      - "usr/lib/*/libplc4.so"
+      - "usr/lib/*/libplds4.so"
