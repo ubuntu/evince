@@ -1,5 +1,5 @@
 name: evince
-version: git
+adopt-info: evince
 summary: Document viewer for popular document formats
 description: |
   This is a document viewer for the GNOME desktop.
@@ -53,7 +53,6 @@ parts:
        - -Dnautilus=false
        - -Dgtk_doc=false
        - -Dintrospection=false
-
     organize:
       snap/evince/current/usr: usr
     build-packages:
@@ -76,6 +75,9 @@ parts:
       - autotools-dev
       - gsettings-desktop-schemas-dev
       - dh-apparmor
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(git describe --tags --abbrev=10)
     prime:
       - "-usr/lib/*.a"
       - "-usr/lib/mozilla"
