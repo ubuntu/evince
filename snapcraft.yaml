@@ -47,7 +47,7 @@ parts:
   evince:
     source: https://gitlab.gnome.org/GNOME/evince.git
     source-type: git
-    source-branch: 'gnome-40'
+    source-branch: 'gnome-41'
     plugin: meson
     meson-parameters:
        - --prefix=/snap/evince/current/usr
