@@ -54,6 +54,7 @@ parts:
        - -Dnautilus=false
        - -Dgtk_doc=false
        - -Dintrospection=false
+    meson-version: 0.58.1
     organize:
       snap/evince/current/usr: usr
     build-packages:
