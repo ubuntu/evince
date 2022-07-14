@@ -7,7 +7,7 @@ description: |
 
 grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict
-base: core20
+base: core22
 
 slots:
   # for GtkApplication registration
@@ -19,7 +19,7 @@ slots:
 apps:
   evince:
     command: usr/bin/evince
-    extensions: [gnome-3-38]
+    extensions: [gnome]
     plugs:
       - avahi-observe
       - cups-control
@@ -28,6 +28,7 @@ apps:
       - network
       - removable-media
     desktop: usr/share/applications/org.gnome.Evince.desktop
+
   evince-previewer:
     command: usr/bin/evince-previewer
     plugs:
@@ -37,6 +38,7 @@ apps:
       - home
       - network
     desktop: usr/share/applications/org.gnome.Evince-previewer.desktop
+
   evince-thumbnailer:
     command: usr/bin/evince-thumbnailer
     plugs:
@@ -44,19 +46,58 @@ apps:
       - home
 
 parts:
+
+  buildenv:
+    plugin: nil
+    build-environment: &buildenv
+      - PKG_CONFIG_PATH: $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+
+  libpoppler:
+    source: https://anongit.freedesktop.org/git/poppler/poppler.git
+    source-type: git
+    source-tag: 'poppler-22.06.0'
+    plugin: cmake
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_BUILD_TYPE=release
+      - -DBUILD_GTK_TESTS=OFF
+      - -DBUILD_QT5_TESTS=OFF
+      - -DBUILD_QT6_TESTS=OFF
+      - -DBUILD_CPP_TESTS=OFF
+      - -DBUILD_MANUAL_TESTS=OFF
+      - -DENABLE_QT5=OFF
+      - -DENABLE_QT6=OFF
+      - -DENABLE_BOOST=OFF
+      - -DENABLE_GOBJECT_INTROSPECTION=OFF
+    build-packages:
+      - libopenjp2-7-dev
+      # fails to compile
+      #- libnss3-dev
+    override-stage: |
+      craftctl default
+      sed -i 's#=/usr#=$CRAFT_STAGE/usr/#g' $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig/poppler.pc
+      sed -i 's#=/usr#=$CRAFT_STAGE/usr/#g' $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig/poppler-cpp.pc
+      sed -i 's#=/usr#=$CRAFT_STAGE/usr/#g' $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig/poppler-glib.pc
+
   evince:
+    after: [ libpoppler ]
     source: https://gitlab.gnome.org/GNOME/evince.git
     source-type: git
-    source-branch: 'gnome-41'
+    source-tag: '42.3'
     plugin: meson
+    build-environment: *buildenv
     meson-parameters:
        - --prefix=/snap/evince/current/usr
+       - --buildtype=release
        - -Dnautilus=false
        - -Dgtk_doc=false
        - -Dintrospection=false
-    meson-version: 0.58.1
+       - -Ddevelopment=false
     organize:
       snap/evince/current/usr: usr
+    override-pull: |
+      craftctl default
+      craftctl set version=$(git describe --tags --abbrev=10)
     build-packages:
       - appstream
       - intltool
@@ -68,7 +109,6 @@ parts:
       - libsecret-1-dev
       - libsm-dev
       - zlib1g-dev
-      - libpoppler-glib-dev
       - libspectre-dev
       - libtiff-dev
       - libdjvulibre-dev
@@ -77,9 +117,6 @@ parts:
       - autotools-dev
       - gsettings-desktop-schemas-dev
       - dh-apparmor
-    override-pull: |
-      snapcraftctl pull
-      snapcraftctl set-version $(git describe --tags --abbrev=10)
     prime:
       - "-usr/lib/*.a"
       - "-usr/lib/mozilla"
@@ -87,18 +124,15 @@ parts:
       - "-usr/lib/systemd"
       - "-usr/lib/evince/4/backends/*.a"
       - "-usr/share/appdata"
+
   libraries:
     plugin: nil
     stage-packages:
       - libarchive13
-      - libpoppler-glib8
-      - libpoppler97
       - libnss3
       - libnspr4
     prime:
       - "usr/lib/*/libarchive.so.*"
-      - "usr/lib/*/libpoppler-glib.so.*"
-      - "usr/lib/*/libpoppler.so.*"
       - "usr/lib/*/libnss3.so"
       - "usr/lib/*/libnssutil3.so"
       - "usr/lib/*/libsmime3.so"
