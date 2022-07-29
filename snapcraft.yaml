@@ -9,6 +9,19 @@ grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict
 base: core22
 
+# We need snapd 2.55 or later to have the needed support for the
+# `cups` interface in snapd
+assumes: [snapd2.55]
+
+# this is not used or needed for anything other than to trigger automatic
+# installation of the cups snap via "default-provider: cups"
+plugs:
+  foo-install-cups:
+    interface: content
+    content: foo
+    default-provider: cups
+    target: $SNAP_DATA/foo
+
 slots:
   # for GtkApplication registration
   evince:
@@ -22,7 +35,7 @@ apps:
     extensions: [gnome]
     plugs:
       - avahi-observe
-      - cups-control
+      - cups
       - gsettings
       - home
       - network
@@ -33,7 +46,7 @@ apps:
     command: usr/bin/evince-previewer
     plugs:
       - avahi-observe
-      - cups-control
+      - cups
       - gsettings
       - home
       - network
@@ -46,7 +59,6 @@ apps:
       - home
 
 parts:
-
   buildenv:
     plugin: nil
     build-environment: &buildenv
