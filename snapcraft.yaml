@@ -59,25 +59,21 @@ apps:
       - home
 
 parts:
-  buildenv:
-    plugin: nil
-    build-environment: &buildenv
-      - PKG_CONFIG_PATH: $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
-
   evince:
     source: https://gitlab.gnome.org/GNOME/evince.git
     source-type: git
     source-tag: '42.3'
     plugin: meson
     parse-info: [usr/share/metainfo/org.gnome.Evince.appdata.xml]
-    build-environment: *buildenv
+    build-environment:
+      - PKG_CONFIG_PATH: $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
     meson-parameters:
-       - --prefix=/snap/evince/current/usr
-       - --buildtype=release
-       - -Dnautilus=false
-       - -Dgtk_doc=false
-       - -Dintrospection=false
-       - -Ddevelopment=false
+      - --prefix=/snap/evince/current/usr
+      - --buildtype=release
+      - -Dnautilus=false
+      - -Dgtk_doc=false
+      - -Dintrospection=false
+      - -Ddevelopment=false
     organize:
       snap/evince/current/usr: usr
     override-pull: |
