@@ -36,7 +36,6 @@ apps:
     plugs:
       - avahi-observe
       - cups
-      - gsettings
       - home
       - network
       - removable-media
