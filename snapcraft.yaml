@@ -80,7 +80,6 @@ parts:
       craftctl set version=$(git describe --tags --abbrev=10)
     build-packages:
       - appstream
-      - intltool
       - libarchive-dev
       - libgail-3-dev
       - libgspell-1-dev
@@ -94,7 +93,6 @@ parts:
       - libdjvulibre-dev
       - libkpathsea-dev
       - libgxps-dev
-      - autotools-dev
       - gsettings-desktop-schemas-dev
       - dh-apparmor
     prime:
