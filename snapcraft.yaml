@@ -61,7 +61,7 @@ parts:
   evince:
     source: https://gitlab.gnome.org/GNOME/evince.git
     source-type: git
-    source-tag: '42.3'
+    source-tag: '44.1'
     plugin: meson
     parse-info: [usr/share/metainfo/org.gnome.Evince.appdata.xml]
     build-environment:
