@@ -61,7 +61,7 @@ parts:
   evince:
     source: https://gitlab.gnome.org/GNOME/evince.git
     source-type: git
-    source-tag: '44.2'
+    source-tag: '44.3'
     source-depth: 1
 # ext:updatesnap
 #   version-format:
